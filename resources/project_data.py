@@ -35,7 +35,7 @@ class Project(Resource):
 
     def delete(self, Project_Name):
         project = ProjectModel.find_by_project(Project_Name)
-        month = MonthModel.find_by_monthly_id(project.id)
+        month = MonthModel.find_by_data_project_name(Project_Name)
         if project:
             project.delete_from_db()
             month.delete_from_db()

@@ -6,7 +6,7 @@ from resources.month_data import Month, MonthList
 from resources.project_data import Project, ProjectList
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:papiai20@localhost/innersource1'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
@@ -19,7 +19,7 @@ def create_tables():
 
 
 api.add_resource(Project, '/project/<string:Project_Name>')
-api.add_resource(Month, '/month/<int:project_id>')
+api.add_resource(Month, '/month/<string:Project_Name>')
 api.add_resource(MonthList, '/months')
 api.add_resource(ProjectList, '/projects')
 

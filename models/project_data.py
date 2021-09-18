@@ -1,15 +1,13 @@
 from db import db
-import pandas as pd
-from flask_restful import reqparse
 
 class ProjectModel(db.Model):
     __tablename__ = 'projects'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, index=True, primary_key=True, unique=True, autoincrement=True)
     ETT_Org = db.Column(db.String(60))
     Manager = db.Column(db.String(60))
     US_Focal = db.Column(db.String(60))
-    Project_Name = db.Column(db.String(60))
+    Project_Name = db.Column(db.String(60), unique=True)
     Skill_Group = db.Column(db.String(60))
     Buissness_Unit = db.Column(db.String(10))
     Capability = db.Column(db.String(60))

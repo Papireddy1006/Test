@@ -1,9 +1,9 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.month_data import MonthModel
+
+
 class Month(Resource):
     parser = reqparse.RequestParser()
-    # parser.add_argument('project_id', type=int, required=True, help='Every item need a project_id')
     parser.add_argument('Jan_2022', type=float, required=True, help='This field cannot be left blank')
     parser.add_argument('Feb_2022', type=float, required=True, help='This field cannot be left blank')
     parser.add_argument('Mar_2022', type=float, required=True, help='This field cannot be left blank')
@@ -19,18 +19,18 @@ class Month(Resource):
 
 
     # @jwt_required()
-    def get(self, project_id):
-        data = MonthModel.find_by_project_id(project_id)
+    def get(self, Project_Name):
+        data = MonthModel.find_by_data_project_name(Project_Name)
         if data:
             return data.json()
-        return {'message':'Item not found'},404
+        return {'message':'Project with this name not found'},404
 
     # @jwt_required(fresh=True)
-    def post(self, project_id):
-        if MonthModel.find_by_project_id(project_id):
+    def post(self, Project_Name):
+        if MonthModel.find_by_project_name(Project_Name):
             data = Month.parser.parse_args()
-            month = MonthModel(project_id, **data)
-            data_query = MonthModel.query.filter_by(project_id=project_id) .first()
+            month = MonthModel(Project_Name, **data)
+            data_query = MonthModel.find_by_data_project_name(Project_Name)
             if data_query is None:
                 try:
                     month.save_to_db()
@@ -40,27 +40,27 @@ class Month(Resource):
                 return month.json(), 201
             return{'message': "data with this project exists, Use PUT option"}, 400
 
-        return {'message': "data with this project having ID {} not exists, first create project".format(project_id)}, 400
+        return {'message': "data with this project having Name {} not exists or data already exists, first create project".format(Project_Name)}, 400
 
 
-    def delete(self,project_id):
-        month = MonthModel.find_by_monthly_id(project_id)
+    def delete(self,Project_Name):
+        month = MonthModel.find_by_data_project_name(Project_Name)
         if month:
             month.delete_from_db()
             return {'message':'Data deleted'}
-        return {'message':'Data with that ID not exist in database'},404
+        return {'message':'Data with this project name not exist in database'},404
 
-    def put(self,project_id):
+    def put(self,Project_Name):
         data = Month.parser.parse_args()
-        month = MonthModel.find_by_monthly_id(project_id)
+        month = MonthModel.find_by_data_project_name(Project_Name)
 
         if month is None:
-            if MonthModel.find_by_project_id(project_id):
-                month = MonthModel(project_id,**data)
+            if MonthModel.find_by_project_name(Project_Name):
+                month = MonthModel(Project_Name,**data)
             else:
-                return {'message': "data with this project having ID {} not exists, first create project".format(project_id)}, 400
+                return {'message': "data with this project having Name {} not exists, first create project".format(Project_Name)}, 400
         else:
-            month.project_id = project_id
+            month.Project_Name = Project_Name
             month.Jan_2022 = data['Jan_2022']
             month.Feb_2022 = data['Feb_2022']
             month.Mar_2022 = data['Mar_2022']
@@ -82,7 +82,5 @@ class Month(Resource):
 class MonthList(Resource):
 
     def get(self):
-
         months = [month.json() for month in MonthModel.find_all()]
-
         return months,200
